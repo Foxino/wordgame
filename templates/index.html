@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Word Game Example</title>
+  </head>
+  <style media="screen">
+    @import url('https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap');
+    body{
+      font-size: 24px;
+      color: white;
+      font-family: 'Roboto Mono', monospace;
+      background-color: mediumaquamarine;
+    }
+    input[type=text], select {
+      width: 55%;
+      font-size: 24px;
+      height: 4vh;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .btn {
+    	border: none;
+    	font-family: inherit;
+    	font-size: inherit;
+    	color: inherit;
+    	background: none;
+    	cursor: pointer;
+    	padding: 25px 80px;
+    	display: inline-block;
+    	margin: 15px 30px;
+    	text-transform: uppercase;
+    	letter-spacing: 1px;
+    	font-weight: 700;
+    	outline: none;
+    	position: relative;
+    	-webkit-transition: all 0.3s;
+    	-moz-transition: all 0.3s;
+    	transition: all 0.3s;
+    }
+
+    .btn:after {
+    	content: '';
+    	position: absolute;
+    	z-index: -1;
+    	-webkit-transition: all 0.3s;
+    	-moz-transition: all 0.3s;
+    	transition: all 0.3s;
+    }
+
+    /* Pseudo elements for icons */
+    .btn:before,
+    .icon-heart:after,
+    .icon-star:after,
+    .icon-plus:after,
+    .icon-file:before {
+    	font-family: 'icomoon';
+    	speak: none;
+    	font-style: normal;
+    	font-weight: normal;
+    	font-variant: normal;
+    	text-transform: none;
+    	line-height: 1;
+    	position: relative;
+    	-webkit-font-smoothing: antialiased;
+    }
+    .btn-1 {
+    	border: 3px solid #fff;
+    	color: #fff;
+    }
+
+    /* Button 1a */
+    .btn-1a:hover,
+    .btn-1a:active {
+    	color: mediumaquamarine;
+    	background: #fff;
+    }
+    @media (max-width:1100px) {
+      input[type=text], select {
+        width: 70%;
+      }
+    }
+  </style>
+  <body style="text-align:center;">
+    <h1 style="padding-top:10vh;padding-bottom:2vh;">Word Game!</h1>
+    <button class="btn btn-1 btn-1a" style="padding-bottom:3vh;" onclick="getwords()" type="button" name="button">Generate Game</button>
+    <div style="padding-bottom:3vh;"class="words">
+
+    </div>
+
+    <div style="padding-bottom:3vh;" class="result">
+
+    </div>
+
+    <div style="padding-bottom:3vh;" class="entry" hidden>
+      <input placeholder="Guess Here" type="text" id="guess"><br>
+      <button style="font-size: 18px;" class="btn btn-1 btn-1a" onclick="guessWord()" type="button" name="button">Guess Word</button>
+    </div>
+    <div style="padding-bottom:3vh;" class="feedback">
+
+    </div>
+  </body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script type="text/javascript">
+
+    result = null;
+    wordsGuessed = [];
+
+    function getwords(){
+      $.getJSON( "/getWordGame", function( data ) {
+        result = data;
+        wordsGuessed = [];
+
+        r = "<span>Must Contain : "+ result.can_include[0] +"</span><br>Must be made up of: ";
+        for (var i = 1; i < result.can_include.length; i++) {
+          r += result.can_include[i]
+          if(i != (result.can_include.length-1)){
+            r+= ", "
+          }
+        }
+        $('.words').html(r);
+        $('.result').html("0/"+result.words.length);
+        $('.entry').show();
+      });
+    }
+
+    function guessWord(){
+      guess = $('#guess').val();
+      $('#guess').val("");
+      if(result.words.includes(guess.toLowerCase())){
+        if(!wordsGuessed.includes(guess.toLowerCase())){
+          wordsGuessed.push(guess.toLowerCase());
+          $('.feedback').css("color", "white");
+          $('.feedback').html(":D");
+
+        }else{
+          $('.feedback').css("color", "orange");
+          $('.feedback').html("Already guessed this word.");
+        }
+      }else{
+        $('.feedback').css("color", "red");
+        $('.feedback').html(":( Not correct");
+      }
+      $('.result').html(wordsGuessed.length+"/"+result.words.length);
+    }
+  </script>
+</html>
